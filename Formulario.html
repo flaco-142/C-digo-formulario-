@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario con Mapa</title>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        form {
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Formulario de Persona</h2>
+    <form id="personForm">
+        <label>Nombre:</label><br>
+        <input type="text" name="nombre" required><br><br>
+
+        <label>Email:</label><br>
+        <input type="email" name="email" required><br><br>
+
+        <label>Domicilio:</label><br>
+        <input type="text" id="address" name="direccion" oninput="geocodeAddress()" required><br><br>
+    </form>
+
+    <div id="map"></div>
+
+    <script>
+        let map;
+        let geocoder;
+        let marker;
+
+        // Hacemos que initMap sea global
+        window.initMap = function () {
+            geocoder = new google.maps.Geocoder();
+            const initialPosition = { lat: -34.6037, lng: -58.3816 }; // Buenos Aires
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 14,
+                center: initialPosition
+            });
+
+            marker = new google.maps.Marker({
+                map: map,
+                position: initialPosition
+            });
+        };
+
+        function geocodeAddress() {
+            const address = document.getElementById("address").value;
+            if (address.length > 5 && geocoder) {
+                geocoder.geocode({ address: address }, (results, status) => {
+                    if (status === "OK") {
+                        const location = results[0].geometry.location;
+                        map.setCenter(location);
+                        marker.setPosition(location);
+                    } else {
+                        console.error("Geocoding failed: " + status);
+                    }
+                });
+            }
+        }
+    </script>
+
+    <!-- Tu clave API va aquí -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAhITcY-enB8lO3Ksimgbcnu2LipzVXh8&callback=initMap">
+    </script>
+</body>
+</html>
